@@ -1,6 +1,10 @@
 const std = @import("std");
 const input = @embedFile("input.txt");
 
+fn sort(comptime T: type, list: []T) void {
+    std.mem.sort(T, list, {}, comptime std.sort.asc(T));
+}
+
 pub fn main() !void {
     var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     const a = arena.allocator();
@@ -14,8 +18,8 @@ pub fn main() !void {
         try rightList.append(a, try std.fmt.parseInt(i32, it2.next() orelse unreachable, 10));
     }
 
-    std.mem.sort(i32, leftList.items, {}, comptime std.sort.asc(i32));
-    std.mem.sort(i32, rightList.items, {}, comptime std.sort.asc(i32));
+    sort(i32, leftList.items);
+    sort(i32, rightList.items);
 
     var sum: u32 = 0;
     for (leftList.items, rightList.items) |left, right| {
