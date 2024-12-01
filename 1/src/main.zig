@@ -6,31 +6,27 @@ pub fn main() !void {
     defer arena.deinit();
     const a = arena.allocator();
 
-    var leftList = std.ArrayList(u32).init(a);
-    var rightList = std.ArrayList(u32).init(a);
+    var leftList = std.ArrayList(i32).init(a);
+    var rightList = std.ArrayList(i32).init(a);
     var it = std.mem.tokenizeScalar(u8, input, '\n');
     while (it.next()) |line| {
         var it2 = std.mem.tokenizeScalar(u8, line, ' ');
-        try leftList.append(try std.fmt.parseInt(u32, it2.next() orelse unreachable, 10));
-        try rightList.append(try std.fmt.parseInt(u32, it2.next() orelse unreachable, 10));
+        try leftList.append(try std.fmt.parseInt(i32, it2.next() orelse unreachable, 10));
+        try rightList.append(try std.fmt.parseInt(i32, it2.next() orelse unreachable, 10));
     }
 
-    std.mem.sort(u32, leftList.items, {}, comptime std.sort.asc(u32));
-    std.mem.sort(u32, rightList.items, {}, comptime std.sort.asc(u32));
+    std.mem.sort(i32, leftList.items, {}, comptime std.sort.asc(i32));
+    std.mem.sort(i32, rightList.items, {}, comptime std.sort.asc(i32));
 
     var sum: u32 = 0;
     for (leftList.items, rightList.items) |left, right| {
-        if (left < right) {
-            sum += right - left;
-        } else {
-            sum += left - right;
-        }
+        sum += @abs(left - right);
     }
     std.debug.print("Part 1: {d}\n", .{sum});
 
     var score: usize = 0;
     for (leftList.items) |left| {
-        score += std.mem.count(u32, rightList.items, &.{left}) * left;
+        score += std.mem.count(i32, rightList.items, &.{left}) * @abs(left);
     }
     std.debug.print("Part 2: {d}\n", .{score});
 }
