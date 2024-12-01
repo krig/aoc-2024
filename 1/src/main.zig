@@ -7,9 +7,7 @@ pub fn main() !void {
     const a = arena.allocator();
 
     var leftList = std.ArrayList(u32).init(a);
-    defer leftList.deinit();
     var rightList = std.ArrayList(u32).init(a);
-    defer rightList.deinit();
     var it = std.mem.tokenizeScalar(u8, input, '\n');
     while (it.next()) |line| {
         var it2 = std.mem.tokenizeScalar(u8, line, ' ');
