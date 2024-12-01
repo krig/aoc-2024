@@ -23,9 +23,9 @@ pub fn main() !void {
     var sum: u32 = 0;
     for (leftList.items, rightList.items) |left, right| {
         if (left < right) {
-            sum += @abs(right - left);
+            sum += right - left;
         } else {
-            sum += @abs(left - right);
+            sum += left - right;
         }
     }
     std.debug.print("Part 1: {d}\n", .{sum});
