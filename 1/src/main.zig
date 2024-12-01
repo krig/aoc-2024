@@ -28,5 +28,11 @@ pub fn main() !void {
             sum += @abs(left - right);
         }
     }
-    std.debug.print("Result: {d}\n", .{sum});
+    std.debug.print("Part 1: {d}\n", .{sum});
+
+    var score: usize = 0;
+    for (leftList.items) |left| {
+        score += std.mem.count(u32, rightList.items, &.{left}) * left;
+    }
+    std.debug.print("Part 2: {d}\n", .{score});
 }
