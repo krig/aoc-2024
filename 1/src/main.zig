@@ -3,7 +3,6 @@ const input = @embedFile("input.txt");
 
 pub fn main() !void {
     var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    defer arena.deinit();
     const a = arena.allocator();
 
     var leftList = std.ArrayList(i32).init(a);
