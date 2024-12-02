@@ -6,10 +6,9 @@ import "core:strconv"
 import "core:slice"
 
 main :: proc() {
-  input := #load("input.txt", string)
+  lines := strings.split_lines(#load("input.txt", string))
   total_safe_part1 := 0
   total_safe_part2 := 0
-  lines := strings.split_lines(input)
 
   for line in lines {
     numbers := slice.mapper(strings.fields(line), strconv.atoi)
