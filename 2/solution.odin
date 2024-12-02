@@ -38,7 +38,7 @@ is_safe_part1 :: proc(numbers: []int, skip := -1) -> bool {
       continue
     }
     delta := abs(number - last)
-    if delta != 1 && delta != 2 && delta != 3 {
+    if !slice.contains([]int{1, 2, 3}, delta) {
       return false
     }
 
