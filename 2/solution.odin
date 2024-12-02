@@ -12,17 +12,10 @@ main :: proc() {
 
   for line in lines {
     numbers := slice.mapper(strings.fields(line), strconv.atoi)
-    if len(numbers) == 0 {
-      continue
-    }
+    (len(numbers) > 0) or_continue
 
-    if is_safe_part1(numbers) {
-      total_safe_part1 += 1
-    }
-
-    if is_safe_part2(numbers) {
-      total_safe_part2 += 1
-    }
+    total_safe_part1 += 1 if is_safe_part1(numbers) else 0
+    total_safe_part2 += 1 if is_safe_part2(numbers) else 0
   }
   fmt.printf("Total safe (part 1): %i\n", total_safe_part1)
   fmt.printf("Total safe (part 2): %i\n", total_safe_part2)
@@ -34,9 +27,7 @@ is_safe_part1 :: proc(numbers: []int, skip := -1) -> bool {
   last := numbers[start]
 
   for number, idx in numbers[(start + 1):] {
-    if skip == idx + 1 {
-      continue
-    }
+    (skip != idx + 1) or_continue
     delta := number - last
     slice.contains([]int{1, 2, 3}, abs(delta)) or_return
 
@@ -54,11 +45,6 @@ is_safe_part1 :: proc(numbers: []int, skip := -1) -> bool {
 }
 
 is_safe_part2 :: proc(numbers: []int, skip := -1) -> bool {
-  if skip == len(numbers) {
-    return false
-  }
-  if is_safe_part1(numbers, skip) {
-    return true
-  }
-  return is_safe_part2(numbers, skip + 1)
+  (skip < len(numbers)) or_return
+  return true if is_safe_part1(numbers, skip) else is_safe_part2(numbers, skip + 1)
 }
