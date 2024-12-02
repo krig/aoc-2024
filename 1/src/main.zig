@@ -14,8 +14,8 @@ pub fn main() !void {
     var it = std.mem.tokenizeScalar(u8, input, '\n');
     while (it.next()) |line| {
         var it2 = std.mem.tokenizeScalar(u8, line, ' ');
-        try leftList.append(a, try std.fmt.parseInt(i32, it2.next() orelse unreachable, 10));
-        try rightList.append(a, try std.fmt.parseInt(i32, it2.next() orelse unreachable, 10));
+        try leftList.append(a, try std.fmt.parseInt(i32, it2.next().?, 10));
+        try rightList.append(a, try std.fmt.parseInt(i32, it2.next().?, 10));
     }
 
     sort(i32, leftList.items);
