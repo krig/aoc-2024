@@ -7,8 +7,7 @@ import "core:slice"
 
 main :: proc() {
   lines := strings.split_lines(#load("input.txt", string))
-  total_safe_part1 := 0
-  total_safe_part2 := 0
+  total_safe_part1, total_safe_part2 := 0, 0
 
   for line in lines {
     numbers := slice.mapper(strings.fields(line), strconv.atoi)
