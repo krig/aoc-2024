@@ -30,9 +30,10 @@ main :: proc() {
 
 is_safe_part1 :: proc(numbers: []int, skip := -1) -> bool {
   state := 0
-  last := numbers[skip == 0 ? 1 : 0]
+  start := 1 if skip == 0 else 0
+  last := numbers[start]
 
-  for number, idx in numbers[(skip == 0 ? 2 : 1):] {
+  for number, idx in numbers[(start + 1):] {
     if skip == idx + 1 {
       continue
     }
