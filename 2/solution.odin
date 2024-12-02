@@ -13,12 +13,10 @@ main :: proc() {
 
   lines := strings.split_lines(input)
   for line in lines {
-    fields := strings.fields(line)
-    if len(fields) == 0 {
+    numbers := slice.mapper(strings.fields(line), strconv.atoi)
+    if len(numbers) == 0 {
       continue
     }
-
-    numbers := slice.mapper(fields, strconv.atoi)
 
     if is_safe_part1(numbers) {
       total_safe_part1 += 1
