@@ -3,6 +3,7 @@ package main
 import "core:fmt"
 import "core:strings"
 import "core:strconv"
+import "core:slice"
 
 main :: proc() {
   input := #load("input.txt", string)
@@ -17,10 +18,7 @@ main :: proc() {
       continue
     }
 
-    numbers := make([]int, len(fields))
-    for field, idx in fields {
-      numbers[idx] = strconv.atoi(field)
-    }
+    numbers := slice.mapper(fields, strconv.atoi)
 
     if is_safe_part1(numbers) {
       total_safe_part1 += 1
