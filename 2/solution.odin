@@ -7,11 +7,10 @@ import "core:slice"
 
 main :: proc() {
   input := #load("input.txt", string)
-
   total_safe_part1 := 0
   total_safe_part2 := 0
-
   lines := strings.split_lines(input)
+
   for line in lines {
     numbers := slice.mapper(strings.fields(line), strconv.atoi)
     if len(numbers) == 0 {
@@ -33,6 +32,7 @@ main :: proc() {
 is_safe_part1 :: proc(numbers: []int, skip := -1) -> bool {
   state := 0
   last := numbers[skip == 0 ? 1 : 0]
+
   for number, idx in numbers[(skip == 0 ? 2 : 1):] {
     if skip == idx + 1 {
       continue
