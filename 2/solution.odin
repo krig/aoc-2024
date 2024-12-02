@@ -36,17 +36,17 @@ is_safe_part1 :: proc(numbers: []int, skip := -1) -> bool {
     if skip == idx + 1 {
       continue
     }
-    delta := abs(number - last)
-    if !slice.contains([]int{1, 2, 3}, delta) {
+    delta := number - last
+    if !slice.contains([]int{1, 2, 3}, abs(delta)) {
+      return false
+    }
+
+    if (state < 0 && delta > 0) || (state > 0 && delta < 0) {
       return false
     }
 
     if state == 0 {
-      state = number > last ? 1 : -1
-    } else if state < 0 && number > last {
-      return false
-    } else if state > 0 && number < last {
-      return false
+      state = delta
     }
 
     last = number
