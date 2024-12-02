@@ -48,15 +48,12 @@ is_safe_part1 :: proc(numbers: []int, skip: int) -> bool {
 
     if state == 0 {
       state = number > last ? 1 : -1
-    } else if state < 0 {
-      if number > last {
-        return false
-      }
-    } else if state > 0 {
-      if number < last {
-        return false
-      }
+    } else if state < 0 && number > last {
+      return false
+    } else if state > 0 && number < last {
+      return false
     }
+
     last = number
   }
   return true
@@ -66,8 +63,7 @@ is_safe_part2 :: proc(numbers: []int, skip: int) -> bool {
   if skip == len(numbers) {
     return false
   }
-  try_safe := is_safe_part1(numbers, skip)
-  if try_safe {
+  if is_safe_part1(numbers, skip) {
     return true
   }
   return is_safe_part2(numbers, skip + 1)
