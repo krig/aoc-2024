@@ -17,16 +17,16 @@ main :: proc() {
       continue
     }
 
-    numbers: [dynamic]int
-    for field in fields {
-      append(&numbers, strconv.atoi(field))
+    numbers := make([]int, len(fields))
+    for field, idx in fields {
+      numbers[idx] = strconv.atoi(field)
     }
 
-    if is_safe_part1(numbers[:], -1) {
+    if is_safe_part1(numbers) {
       total_safe_part1 += 1
     }
 
-    if is_safe_part2(numbers[:], -1) {
+    if is_safe_part2(numbers) {
       total_safe_part2 += 1
     }
   }
@@ -34,7 +34,7 @@ main :: proc() {
   fmt.printf("Total safe (part 2): %i\n", total_safe_part2)
 }
 
-is_safe_part1 :: proc(numbers: []int, skip: int) -> bool {
+is_safe_part1 :: proc(numbers: []int, skip := -1) -> bool {
   state := 0
   last := numbers[skip == 0 ? 1 : 0]
   for number, idx in numbers[(skip == 0 ? 2 : 1):] {
@@ -59,7 +59,7 @@ is_safe_part1 :: proc(numbers: []int, skip: int) -> bool {
   return true
 }
 
-is_safe_part2 :: proc(numbers: []int, skip: int) -> bool {
+is_safe_part2 :: proc(numbers: []int, skip := -1) -> bool {
   if skip == len(numbers) {
     return false
   }
