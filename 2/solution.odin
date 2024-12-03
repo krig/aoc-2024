@@ -7,17 +7,17 @@ import "core:slice"
 
 main :: proc() {
   lines := strings.split_lines(#load("input.txt", string))
-  total_safe_part1, total_safe_part2 := 0, 0
+  num_safe_part1, num_safe_part2 := 0, 0
 
   for line in lines {
     numbers := slice.mapper(strings.fields(line), strconv.atoi)
     (len(numbers) > 0) or_continue
 
-    total_safe_part1 += 1 if is_safe_part1(numbers) else 0
-    total_safe_part2 += 1 if is_safe_part2(numbers) else 0
+    num_safe_part1 += 1 if is_safe_part1(numbers) else 0
+    num_safe_part2 += 1 if is_safe_part2(numbers) else 0
   }
-  fmt.printf("Total safe (part 1): %i\n", total_safe_part1)
-  fmt.printf("Total safe (part 2): %i\n", total_safe_part2)
+  fmt.printf("Safe (part 1): %i\n", num_safe_part1)
+  fmt.printf("Safe (part 2): %i\n", num_safe_part2)
 }
 
 is_safe_part1 :: proc(numbers: []int, skip := -1) -> bool {
@@ -34,9 +34,7 @@ is_safe_part1 :: proc(numbers: []int, skip := -1) -> bool {
       return false
     }
 
-    if state == 0 {
-      state = delta
-    }
+    if state == 0 do state = delta
 
     last = number
   }
