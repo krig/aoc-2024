@@ -4,6 +4,7 @@ Languages:
 
 1. [Zig](https://ziglang.org)
 2. [Odin](https://odin-lang.org)
+3. [Janet](https://janet-lang.org)
 
 ## Running with Zig
 
@@ -27,3 +28,11 @@ cd 2
 odin run .
 ```
 
+## Running with Janet
+
+Janet version is 1.36.0-homebrew.
+
+```
+cd 3
+janet solution.janet
+```
