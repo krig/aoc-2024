@@ -12,5 +12,4 @@
     :main (some :line)}))
 
 (defn main [&]
-  (def input (file/read (file/open "input.txt") :all))
-  (pp (apply + (peg/match mul-grammar input))))
+  (pp (apply + (peg/match mul-grammar (slurp "input.txt")))))
