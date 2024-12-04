@@ -5,6 +5,7 @@ Languages:
 1. [Zig](https://ziglang.org)
 2. [Odin](https://odin-lang.org)
 3. [Janet](https://janet-lang.org)
+4. [Python](https://python.org)
 
 ## Running with Zig
 
@@ -35,4 +36,13 @@ Janet version is 1.36.0-homebrew.
 ```
 cd 3
 janet solution.janet
+```
+
+## Running with Python (uv)
+
+Python version is 3.13.
+
+```
+cd 4
+uv run --with pytest solution.py
 ```

@@ -2,3 +2,4 @@
 zig-out/
 2/2
 input.txt
+__pycache__
