@@ -15,8 +15,7 @@
 (defn sort-page-set [page-set before-rules]
   (sort page-set (fn [a b]
     (if-let [rule (get before-rules b)]
-      (if (get rule a) true false)
-      false))))
+      (get rule a)))))
 
 (defn main [&]
   (var page-sets @[])
