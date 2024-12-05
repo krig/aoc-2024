@@ -30,14 +30,14 @@
                  (loop [j :range [i (length page-set)]]
                    (if (get rule (get page-set j))
                      (return incorrect true)))))))
-    (pp
+    (print
       (reduce + 0
               (map (fn [page-set]
                      (if (not (incorrect? page-set))
                        (median page-set)
                        0))
                    page-sets)))
-    (pp
+    (print
       (reduce + 0
               (map (fn [page-set]
                      (if (incorrect? page-set)
