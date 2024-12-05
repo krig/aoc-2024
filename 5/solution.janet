@@ -17,6 +17,9 @@
     (if-let [rule (get before-rules b)]
       (get rule a)))))
 
+(defn middle [ind]
+  (get ind (math/floor (/ (length ind) 2))))
+
 (defn main [&]
   (var page-sets @[])
   # before-rules: for each page in rules, every page listed must come before it
@@ -43,7 +46,7 @@
             (set correct false)))))
     (if (not correct)
       (let [sorted-page-set (sort-page-set page-set before-rules)]
-        (set page-sum (+ page-sum (get sorted-page-set (math/floor (/ (length sorted-page-set) 2))))))))
+        (set page-sum (+ page-sum (middle sorted-page-set))))))
 
       (pp page-sum))
 
