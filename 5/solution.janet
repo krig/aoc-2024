@@ -1,52 +1,35 @@
 #!/usr/bin/env janet
 
-# read the ordering rules,
-# then for each page set:
-# - make sure it follows the ordering rules
-# - find the middle page number of each correct batch
-# - add all the middle page numbers
-
-(def page-order (peg/compile
-  ~{:main (* (number :d+) "|" (number :d+))}))
-
-(def page-set (peg/compile
-  ~{:main (* (number :d+) (any (* "," (number :d+))))}))
-
-(defn sort-page-set [page-set before-rules]
-  (sort page-set (fn [a b]
-    (if-let [rule (get before-rules b)]
-      (get rule a)))))
-
-(defn middle [ind]
-  (get ind (math/floor (/ (length ind) 2))))
+(defn read-input []
+  (def page-order (peg/compile ~{:main (* (number :d+) "|" (number :d+))}))
+  (def page-set (peg/compile ~{:main (* (number :d+) (any (* "," (number :d+))))}))
+  (let [page-sets @[] before-rules @{}]
+    (with [input (file/open "input.txt") file/close]
+      (each line (file/lines input)
+        (if-let [[before after] (peg/match page-order line)]
+          (if-let [rule (get before-rules after)]
+            (set (rule before) true)
+            (put before-rules after @{ before true }))
+          (if-let [pageset (peg/match page-set line)]
+            (array/push page-sets pageset)))))
+    @[page-sets before-rules]))
 
 (defn main [&]
-  (var page-sets @[])
-  # before-rules: for each page in rules, every page listed must come before it
-  (var before-rules @{})
+  (defn sort-page-set [page-set before-rules]
+    (sort page-set (fn [a b]
+                     (if-let [rule (get before-rules b)]
+                       (get rule a)))))
 
-  (with [input (file/open "input.txt") file/close]
-    (each line (file/lines input)
-      (if-let [order (peg/match page-order line)]
-        (if-let [rule (get before-rules (get order 1))]
-          (set (rule (get order 0)) true)
-          (put before-rules (get order 1) @{ (get order 0) true }))
-        (if-let [pageset (peg/match page-set line)]
-          (array/push page-sets pageset)))))
+  (defn middle [ind]
+    (get ind (math/floor (/ (length ind) 2))))
 
-  # for each page: make sure none of the pages after it
-  # appear in its before set
-  (var page-sum 0)
-  (each page-set page-sets
-    (var correct true)
-    (loop [i :range [0 (length page-set)]]
-      (if-let [rule (get before-rules (get page-set i))]
-        (loop [j :range [i (length page-set)]]
-          (if (get rule (get page-set j))
-            (set correct false)))))
-    (if (not correct)
-      (let [sorted-page-set (sort-page-set page-set before-rules)]
-        (set page-sum (+ page-sum (middle sorted-page-set))))))
-
-  (pp page-sum))
-
+  (let [[page-sets before-rules] (read-input)]
+    (pp (reduce + 0 (map (fn [page-set]
+      (if (label incorrect
+                 (loop [i :range [0 (length page-set)]]
+                   (if-let [rule (get before-rules (get page-set i))]
+                     (loop [j :range [i (length page-set)]]
+                       (if (get rule (get page-set j))
+                         (return incorrect true))))))
+        (let [sorted-page-set (sort-page-set page-set before-rules)]
+          (middle sorted-page-set)) 0)) page-sets)))))
