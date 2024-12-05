@@ -16,9 +16,10 @@
 
 (defn main [&]
   (defn sort-page-set [page-set before-rules]
-    (sort page-set (fn [a b]
-                     (if-let [rule (get before-rules b)]
-                       (get rule a)))))
+    (sort page-set
+          (fn [a b]
+            (if-let [rule (get before-rules b)]
+              (get rule a)))))
 
   (defn middle [ind]
     (get ind (math/floor (/ (length ind) 2))))
