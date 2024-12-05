@@ -15,22 +15,25 @@
     @[page-sets before-rules]))
 
 (defn main [&]
-  (defn sort-page-set [page-set before-rules]
-    (sort page-set
-          (fn [a b]
-            (if-let [rule (get before-rules b)]
-              (get rule a)))))
-
-  (defn middle [ind]
+  (defn median [ind]
     (get ind (math/floor (/ (length ind) 2))))
-
   (let [[page-sets before-rules] (read-input)]
+    (defn sort-page-set [page-set]
+      (sort page-set
+            (fn [a b]
+              (if-let [rule (get before-rules b)]
+                (get rule a)))))
+    (defn incorrect? [page-set]
+      (label incorrect
+             (loop [i :range [0 (length page-set)]]
+               (if-let [rule (get before-rules (get page-set i))]
+                 (loop [j :range [i (length page-set)]]
+                   (if (get rule (get page-set j))
+                     (return incorrect true)))))))
     (pp (reduce + 0 (map (fn [page-set]
-      (if (label incorrect
-                 (loop [i :range [0 (length page-set)]]
-                   (if-let [rule (get before-rules (get page-set i))]
-                     (loop [j :range [i (length page-set)]]
-                       (if (get rule (get page-set j))
-                         (return incorrect true))))))
-        (let [sorted-page-set (sort-page-set page-set before-rules)]
-          (middle sorted-page-set)) 0)) page-sets)))))
+                           (if (not (incorrect? page-set))
+                             (median page-set) 0)) page-sets)))
+    (pp (reduce + 0 (map (fn [page-set]
+                           (if (incorrect? page-set)
+                             (let [sorted-page-set (sort-page-set page-set)]
+                               (median sorted-page-set)) 0)) page-sets)))))
