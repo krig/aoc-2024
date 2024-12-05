@@ -12,6 +12,12 @@
 (def page-set (peg/compile
   ~{:main (* (number :d+) (any (* "," (number :d+))))}))
 
+(defn sort-page-set [page-set before-rules]
+  (sort page-set (fn [a b]
+    (if-let [rule (get before-rules b)]
+      (if (get rule a) true false)
+      false))))
+
 (defn main [&]
   (var page-sets @[])
   # before-rules: for each page in rules, every page listed must come before it
@@ -36,8 +42,9 @@
         (loop [j :range [i (length page-set)]]
           (if (get rule (get page-set j))
             (set correct false)))))
-    (if correct
-      (set page-sum (+ page-sum (get page-set (math/floor (/ (length page-set) 2)))))))
+    (if (not correct)
+      (let [sorted-page-set (sort-page-set page-set before-rules)]
+        (set page-sum (+ page-sum (get sorted-page-set (math/floor (/ (length sorted-page-set) 2))))))))
 
       (pp page-sum))
 
