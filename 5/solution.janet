@@ -48,5 +48,5 @@
       (let [sorted-page-set (sort-page-set page-set before-rules)]
         (set page-sum (+ page-sum (middle sorted-page-set))))))
 
-      (pp page-sum))
+  (pp page-sum))
 
