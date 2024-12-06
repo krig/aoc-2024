@@ -81,6 +81,12 @@ find_all_loop_places :: proc(game: ^Game) -> int #no_bounds_check {
   e: Bit_Array
   s: Bit_Array
   w: Bit_Array
+  defer {
+    destroy(&n)
+    destroy(&e)
+    destroy(&s)
+    destroy(&w)
+  }
   for new_obstacle := 0; new_obstacle < game.w*game.h; new_obstacle += 1 {
     game.gx, game.gy, game.gd = gx, gy, gd
     if new_obstacle == gy*game.h + gx do continue
