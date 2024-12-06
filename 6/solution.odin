@@ -89,28 +89,29 @@ count_visited :: proc(game: ^Game) -> int {
   return count
 }
 
-find_all_loop_places :: proc(game: ^Game) -> int {
+find_all_loop_places :: proc(game: ^Game) -> int #no_bounds_check {
   places := 0
   gx, gy, gd := game.gx, game.gy, game.gd
   for new_obstacle := 0; new_obstacle < game.w*game.h; new_obstacle += 1 {
-    clear(&game.moves)
     game.gx, game.gy, game.gd = gx, gy, gd
+    clear(&game.moves)
+    append(&game.moves, Move{ game.gx, game.gy, game.gd })
     if new_obstacle == gy*game.h + gx do continue
     if bit_array.get(&game.obstacles, new_obstacle) do continue
-    fmt.println("Checking obstacle @", new_obstacle)
     loop: for {
       if !move_guard(game, new_obstacle) do break loop
       // check if last move is a repeat
-      last_move := game.moves[len(game.moves)-1]
-      for i := 0; i < len(game.moves)-1; i += 1 {
-        if last_move == game.moves[i] {
-          places += 1
-          fmt.println("Found loop place @", new_obstacle, places)
-          break loop
+      if len(game.moves) > 4 {
+        last_move := game.moves[len(game.moves)-1]
+        for i := len(game.moves)-2; i >= 0; i -= 1 {
+          if last_move == game.moves[i] {
+            places += 1
+            fmt.println("Found loop place @", new_obstacle, places, "at move", i, "of", len(game.moves))
+            break loop
+          }
         }
       }
     }
-    fmt.println("num moves:", len(game.moves))
   }
   return places
 }
