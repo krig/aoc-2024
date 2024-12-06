@@ -82,7 +82,6 @@ find_all_loop_places :: proc(game: ^Game) -> int {
     game.gx, game.gy, game.gd = gx, gy, gd
     if new_obstacle == gy*game.h + gx do continue
     if !get(&game.visited, new_obstacle) do continue
-    if get(&game.obstacles, new_obstacle) do continue
     for dir in Dir {
       clear(&trail[dir])
     }
