@@ -102,25 +102,21 @@ find_all_loop_places :: proc(game: ^Game) -> int #no_bounds_check {
       case .N:
         if get(&n, game.gy*game.h + game.gx) {
           places += 1
-          fmt.println("Found loop place @", new_obstacle, places)
           break loop
         }
       case .S:
         if get(&s, game.gy*game.h + game.gx) {
           places += 1
-          fmt.println("Found loop place @", new_obstacle, places)
           break loop
         }
       case .E:
         if get(&e, game.gy*game.h + game.gx) {
           places += 1
-          fmt.println("Found loop place @", new_obstacle, places)
           break loop
         }
       case .W:
         if get(&w, game.gy*game.h + game.gx) {
           places += 1
-          fmt.println("Found loop place @", new_obstacle, places)
           break loop
         }
       }
@@ -139,10 +135,10 @@ delete_game :: proc(game: ^Game) {
 main :: proc() {
   game := parse_map(#load("input.txt", string))
   defer delete_game(game)
-  fmt.println(game.w, game.h)
-  gx, gy, gd := game.gx, game.gy, game.gd
-  fmt.println("visited:", count_visited(game))
-  game.gx, game.gy, game.gd = gx, gy, gd
+  //fmt.println(game.w, game.h)
+  //gx, gy, gd := game.gx, game.gy, game.gd
+  //fmt.println("visited:", count_visited(game))
+  //game.gx, game.gy, game.gd = gx, gy, gd
   fmt.println("num loop spots:", find_all_loop_places(game))
 }
 

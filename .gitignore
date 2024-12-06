@@ -1,6 +1,7 @@
 .zig-cache/
 zig-out/
 2/2
+6/6
 input.txt
 __pycache__
 solution
