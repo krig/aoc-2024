@@ -25,38 +25,35 @@ obstacle_at :: proc(game: ^Game, x, y, new_obstacle: int) -> bool {
   return bit_array.get(&game.obstacles, y * game.h + x)
 }
 
+Move :: struct {
+  d: Dir,
+  dx: int,
+  dy: int,
+}
+
+moves := [Dir]Move {
+  .N = { .E, 0, -1 },
+  .E = { .S, 1, 0 },
+  .S = { .W, 0, 1 },
+  .W = { .N, -1, 0 },
+}
+
 move_guard :: proc(game: ^Game, new_obstacle: int = -1) -> bool {
-    switch game.gd {
-    case .N:
-      if game.gy == 0 do return false
-      if obstacle_at(game, game.gx, game.gy - 1, new_obstacle) {
-        game.gd = .E
-      } else {
-        game.gy -= 1
-      }
-    case .S:
-      if game.gy == (game.h-1) do return false
-      if obstacle_at(game, game.gx, game.gy + 1, new_obstacle) {
-        game.gd = .W
-      } else {
-        game.gy += 1
-      }
-    case .W:
-      if game.gx == 0 do return false
-      if obstacle_at(game, game.gx - 1, game.gy, new_obstacle) {
-        game.gd = .N
-      } else {
-        game.gx -= 1
-      }
-    case .E:
-      if game.gx == (game.w-1) do return false
-      if obstacle_at(game, game.gx + 1, game.gy, new_obstacle) {
-        game.gd = .S
-      } else {
-        game.gx += 1
-      }
-    }
-    return true
+  if moves[game.gd].dx < 0 && game.gx == 0 do return false
+  if moves[game.gd].dx > 0 && game.gx == (game.w-1) do return false
+  if moves[game.gd].dy < 0 && game.gy == 0 do return false
+  if moves[game.gd].dy > 0 && game.gy == (game.h-1) do return false
+
+  for obstacle_at(game, game.gx + moves[game.gd].dx, game.gy + moves[game.gd].dy, new_obstacle) {
+    game.gd = moves[game.gd].d
+    if moves[game.gd].dx < 0 && game.gx == 0 do return false
+    if moves[game.gd].dx > 0 && game.gx == (game.w-1) do return false
+    if moves[game.gd].dy < 0 && game.gy == 0 do return false
+    if moves[game.gd].dy > 0 && game.gy == (game.h-1) do return false
+  }
+  game.gx += moves[game.gd].dx
+  game.gy += moves[game.gd].dy
+  return true
 }
 
 count_visited :: proc(game: ^Game) -> int {
@@ -73,59 +70,32 @@ count_visited :: proc(game: ^Game) -> int {
   return count
 }
 
-find_all_loop_places :: proc(game: ^Game) -> int #no_bounds_check {
+find_all_loop_places :: proc(game: ^Game) -> int {
   using bit_array
   places := 0
   gx, gy, gd := game.gx, game.gy, game.gd
-  n: Bit_Array
-  e: Bit_Array
-  s: Bit_Array
-  w: Bit_Array
-  defer {
-    destroy(&n)
-    destroy(&e)
-    destroy(&s)
-    destroy(&w)
+  trail: [Dir]Bit_Array
+  defer for dir in Dir {
+    destroy(&trail[dir])
   }
   for new_obstacle := 0; new_obstacle < game.w*game.h; new_obstacle += 1 {
     game.gx, game.gy, game.gd = gx, gy, gd
     if new_obstacle == gy*game.h + gx do continue
-    if bit_array.get(&game.obstacles, new_obstacle) do continue
+    if !get(&game.visited, new_obstacle) do continue
+    if get(&game.obstacles, new_obstacle) do continue
+    nloops := 0
+    for dir in Dir {
+      clear(&trail[dir])
+    }
     loop: for {
-      switch game.gd {
-      case .N:
-        set(&n, game.gy*game.h + game.gx)
-      case .S:
-        set(&s, game.gy*game.h + game.gx)
-      case .E:
-        set(&e, game.gy*game.h + game.gx)
-      case. W:
-        set(&w, game.gy*game.h + game.gx)
-      }
+      set(&trail[game.gd], game.gy*game.h + game.gx)
       if !move_guard(game, new_obstacle) do break loop
       // check if last move is a repeat
-      switch game.gd {
-      case .N:
-        if get(&n, game.gy*game.h + game.gx) {
-          places += 1
-          break loop
-        }
-      case .S:
-        if get(&s, game.gy*game.h + game.gx) {
-          places += 1
-          break loop
-        }
-      case .E:
-        if get(&e, game.gy*game.h + game.gx) {
-          places += 1
-          break loop
-        }
-      case .W:
-        if get(&w, game.gy*game.h + game.gx) {
-          places += 1
-          break loop
-        }
+      if get(&trail[game.gd], game.gy*game.h + game.gx) {
+        places += 1
+        break loop
       }
+      nloops += 1
     }
   }
   return places
@@ -141,10 +111,10 @@ delete_game :: proc(game: ^Game) {
 main :: proc() {
   game := parse_map(#load("input.txt", string))
   defer delete_game(game)
-  //fmt.println(game.w, game.h)
-  //gx, gy, gd := game.gx, game.gy, game.gd
-  //fmt.println("visited:", count_visited(game))
-  //game.gx, game.gy, game.gd = gx, gy, gd
+  fmt.println(game.w, game.h)
+  gx, gy, gd := game.gx, game.gy, game.gd
+  fmt.println("visited:", count_visited(game))
+  game.gx, game.gy, game.gd = gx, gy, gd
   fmt.println("num loop spots:", find_all_loop_places(game))
 }
 
