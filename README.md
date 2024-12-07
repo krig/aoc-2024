@@ -8,6 +8,8 @@ Languages:
 4. [Python](https://python.org)
 5. [Janet](https://janet-lang.org) - Again. Tried [Gleam](https://gleam.run) but
    no (see below).
+6. Back to Odin
+7. Also Odin! I liked Odin.
 
 ## Running with Zig
 
