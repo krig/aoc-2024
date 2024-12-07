@@ -8,31 +8,28 @@ import "core:math"
 main :: proc() {
   lines := strings.split_lines(#load("input.txt", string))
   sum :uint = 0
+  numbers: [dynamic]uint
   for line in lines {
-    sum += calc(line)
+    sum += calc(line, &numbers)
+    clear(&numbers)
   }
   fmt.println(sum)
 }
 
-calc :: proc(line: string) -> uint {
+calc :: proc(line: string, numbers: ^[dynamic]uint) -> uint {
   using strings
   using strconv
 
-  context.allocator = context.temp_allocator
-  defer free_all(context.temp_allocator)
-
   head, _, tail := partition(line, ": ")
   total := uint(atoi(head))
-  numbers: [dynamic]uint
   for s in split_iterator(&tail, " ") {
-    append(&numbers, uint(atoi(s)))
+    append(numbers, uint(atoi(s)))
   }
 
-  sum := calc_sum(numbers, total)
-  if sum == total {
-    return sum
-  }
-  return calc_sum_2(numbers, total)
+  if len(numbers^) == 0 do return 0
+  sum := calc_sum(numbers^, total)
+  if sum == total do return sum
+  return calc_sum_2(numbers^, total)
 }
 
 calc_sum :: proc(numbers: [dynamic]uint, total: uint) -> uint {
