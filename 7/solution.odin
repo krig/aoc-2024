@@ -15,14 +15,17 @@ main :: proc() {
 }
 
 calc :: proc(line: string) -> uint {
+  using strings
+  using strconv
+
   context.allocator = context.temp_allocator
   defer free_all(context.temp_allocator)
 
-  head, _, tail := strings.partition(line, ": ")
-  total := uint(strconv.atoi(head))
+  head, _, tail := partition(line, ": ")
+  total := uint(atoi(head))
   numbers: [dynamic]uint
-  for s in strings.split_iterator(&tail, " ") {
-    append(&numbers, uint(strconv.atoi(s)))
+  for s in split_iterator(&tail, " ") {
+    append(&numbers, uint(atoi(s)))
   }
 
   sum := calc_sum(numbers, total)
@@ -61,6 +64,7 @@ concat :: proc(a, b: uint) -> uint {
 }
 
 calc_rec :: proc(numbers: [dynamic]uint, i, sum, total: uint) -> uint {
+  if sum > total do return 0
   if i >= len(numbers) {
     if sum == total {
       return sum
@@ -68,17 +72,11 @@ calc_rec :: proc(numbers: [dynamic]uint, i, sum, total: uint) -> uint {
     return 0
   }
   v := calc_rec(numbers, i + 1, sum + numbers[i], total)
-  if v == total {
-    return v
-  }
+  if v == total do return v
   v = calc_rec(numbers, i + 1, sum * numbers[i], total)
-  if v == total {
-    return v
-  }
+  if v == total do return v
   v = calc_rec(numbers, i + 1, concat(sum, numbers[i]), total)
-  if v == total {
-    return v
-  }
+  if v == total do return v
   return 0
 }
 
