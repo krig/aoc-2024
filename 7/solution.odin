@@ -63,10 +63,7 @@ concat :: proc(a, b: uint) -> uint {
 calc_rec :: proc(numbers: [dynamic]uint, i, sum, total: uint) -> uint {
   if sum > total do return 0
   if i >= len(numbers) {
-    if sum == total {
-      return sum
-    }
-    return 0
+    return sum if sum == total else 0
   }
   v := calc_rec(numbers, i + 1, sum + numbers[i], total)
   if v == total do return v
