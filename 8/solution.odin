@@ -102,11 +102,13 @@ count_antinodes :: proc(world: ^World) -> int {
   }
   for y in 0..<world.h {
     for x in 0..<world.w {
-      r, ok := at(world, x, y)
-      if ok {
-        fmt.print(r)
-      } else if bit_array.get(&occupied, y*world.h + x) {
-        fmt.print("#")
+      if bit_array.get(&occupied, y*world.h + x) {
+        r, ok := at(world, x, y)
+        if ok {
+          fmt.print(r)
+        } else {
+          fmt.print("#")
+        }
       } else {
         fmt.print(".")
       }
