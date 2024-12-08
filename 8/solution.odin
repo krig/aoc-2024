@@ -89,11 +89,8 @@ count_antinodes :: proc(world: ^World) -> int {
   context.allocator = context.temp_allocator
   defer free_all(context.temp_allocator)
   occupied: bit_array.Bit_Array
-  dr := '.'
   for &antenna in world.antennas {
-    // if dr != '.' && dr != antenna.f do continue
     bit_array.set(&occupied, antenna.p.y*world.h + antenna.p.x)
-    dr = antenna.f
     for &other in world.antennas {
       if antenna.f != other.f do continue
       if &other == &antenna do continue
