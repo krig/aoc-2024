@@ -94,9 +94,7 @@ count_antinodes :: proc(world: ^World) -> int {
     for &other in world.antennas {
       if antenna.f != other.f do continue
       if &other == &antenna do continue
-      fmt.println("testing", antenna, other)
       ans := antinodes(world, &antenna, &other)
-      fmt.println("    found", ans)
       for an in ans {
         bit_array.set(&occupied, an.y*world.h + an.x)
       }
