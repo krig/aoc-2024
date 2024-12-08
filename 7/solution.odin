@@ -53,11 +53,9 @@ calc_sum :: proc(numbers: [dynamic]uint, total: uint) -> uint {
 
 // thx Laytan via p1xelHerO
 concat :: proc(a, b: uint) -> uint {
-  d := a
-  for c := b; c > 0; c /= 10 {
-    d *= 10
-  }
-  return d + b
+  c : uint = 10
+  for c < b do c *= 10
+  return a*c + b
 }
 
 calc_rec :: proc(numbers: [dynamic]uint, i, sum, total: uint) -> uint {
