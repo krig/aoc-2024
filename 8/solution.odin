@@ -68,6 +68,7 @@ antinodes :: proc(world: ^World, a, b: ^Antenna) -> (Maybe(Vec2), Maybe(Vec2)) {
 
 count_antinodes :: proc(world: ^World) -> int {
   ans: [dynamic]Vec2
+  defer delete(ans)
   for &antenna in world.antennas {
     for &other in world.antennas {
       if antenna.f == other.f && other != antenna {
