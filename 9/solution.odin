@@ -75,33 +75,40 @@ defrag_block :: proc(text: string) -> uint {
 			append(&defragged, Block{-1, free_len})
 		}
 	}
+	empty_pos := 0
 	read_pos := len(defragged)-1
 	for {
-		//fmt.println(defragged, len(defragged), read_pos)
-		insert_pos := 0
-		for read_pos >= 0 && defragged[read_pos].id == -1 {
+		for empty_pos < read_pos && defragged[empty_pos].id != -1 {
+			empty_pos += 1
+		}
+		if empty_pos >= read_pos do break
+		insert_pos := empty_pos
+		for read_pos > insert_pos && defragged[read_pos].id == -1 {
 			read_pos -= 1
 		}
-		if read_pos < 0 do break
+		if read_pos <= insert_pos do break
 		if defragged[read_pos].id == -1 do break
+
+		rlen := defragged[read_pos].length
+
 		for  {
-			for insert_pos < read_pos && insert_pos < len(defragged) && defragged[insert_pos].id != -1 {
+			for insert_pos < read_pos && defragged[insert_pos].id != -1 {
 				insert_pos += 1
 			}
-			if insert_pos < read_pos && insert_pos < len(defragged) && defragged[insert_pos].length < defragged[read_pos].length {
+			if insert_pos < read_pos && defragged[insert_pos].length < rlen {
 				insert_pos += 1
 			} else {
 				break
 			}
 		}
-		if insert_pos >= len(defragged) {
+		if insert_pos >= read_pos {
+			read_pos -= 1
 			continue
 		}
 		if defragged[insert_pos].id != -1 {
 			read_pos -= 1
 			continue
 		}
-		//fmt.println("moving", read_pos, defragged[read_pos], "to", insert_pos, defragged[insert_pos])
 		if defragged[read_pos].length == defragged[insert_pos].length {
 			defragged[insert_pos] = defragged[read_pos]
 			defragged[read_pos] = Block{-1, defragged[read_pos].length}
