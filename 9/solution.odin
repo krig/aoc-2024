@@ -119,7 +119,6 @@ defrag_block :: proc(text: string) -> uint {
 			defragged[insert_pos].length = defragged[read_pos].length
 			defragged[read_pos] = Block{-1, defragged[read_pos].length}
 			inject_at(&defragged, insert_pos+1, new_free)
-			read_pos += 1
 		}
 	}
 	//fmt.println(defragged)
