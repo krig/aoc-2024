@@ -6,57 +6,36 @@ import "core:slice"
 
 main :: proc() {
 	fmt.println("count=", trailheads(#load("input.txt", string)))
-	//for example in EXAMPLES {
-	//	fmt.println("expected=", example.expected, "count=", trailheads(example.input))
-	//}
 }
 
 trailheads :: proc(input: string) -> uint {
 	m := parse(input)
 	defer map_delete(m)
 
+	score :uint = 0
 	for goal in m.goals {
-		fmt.println("seek", goal)
-		seek(m, goal, goal, 10)
-	}
-	score :uint= 0
-	for key, value in m.paths {
-		score += len(value)
+		score += seek(m, goal, goal, 10)
 	}
 	return score
 }
 
-seek :: proc(m: ^Heightmap, start: Vec2, pos: Vec2, from: u8) {
-	if pos.x < 0 || pos.x >= m.w || pos.y < 0 || pos.y >= m.h do return
+seek :: proc(m: ^Heightmap, start: Vec2, pos: Vec2, from: u8) -> uint {
+	if pos.x < 0 || pos.x >= m.w || pos.y < 0 || pos.y >= m.h do return 0
 	curr := at(m, pos.x, pos.y)^
-	if from - curr != 1 do return
-	if curr == 0 {
-		poses, ok := &m.paths[start]
-		if ok {
-			//if !slice.contains(poses[:], pos) {
-			fmt.println("goal", pos)
-			append(poses, pos)
-			//} else {
-			//	fmt.println("dup", pos)
-			//}
-		} else {
-			fmt.println("goal!", pos)
-			stuff := make([dynamic]Vec2)
-			append(&stuff, pos)
-			m.paths[start] = stuff
-		}
-	}
-	seek(m, start, {pos.x-1, pos.y}, curr)
-	seek(m, start, {pos.x+1, pos.y}, curr)
-	seek(m, start, {pos.x, pos.y+1}, curr)
-	seek(m, start, {pos.x, pos.y-1}, curr)
+	if from - curr != 1 do return 0
+	if curr == 0 do return 1
+	ret :uint= 0
+	ret += seek(m, start, {pos.x-1, pos.y}, curr)
+	ret += seek(m, start, {pos.x+1, pos.y}, curr)
+	ret += seek(m, start, {pos.x, pos.y+1}, curr)
+	ret += seek(m, start, {pos.x, pos.y-1}, curr)
+	return ret
 }
 
 parse :: proc(input: string) -> ^Heightmap {
 	using strings
 	m := new(Heightmap)
 	m.w, m.h = index_byte(input, '\n'), count(input, "\n")
-	m.paths = make(map[Vec2][dynamic]Vec2)
 	resize(&m.tiles, m.w * m.h)
 	x, y := 0, 0
 	for r in input {
@@ -80,12 +59,8 @@ at :: proc(m: ^Heightmap, x, y: int) -> ^u8 {
 }
 
 map_delete :: proc(m: ^Heightmap) {
-	for _, value in m.paths {
-		delete(value)
-	}
 	delete(m.tiles)
 	delete(m.goals)
-	delete(m.paths)
 	free(m)
 }
 
@@ -94,7 +69,6 @@ Heightmap :: struct {
 	goals: [dynamic]Vec2,
 	w: int,
 	h: int,
-	paths: map[Vec2][dynamic]Vec2
 }
 
 Vec2 :: distinct [2]int
