@@ -1,7 +1,6 @@
 package main
 
 import "core:fmt"
-import "core:strings"
 
 Vec2 :: distinct [2]int
 
@@ -47,8 +46,18 @@ at :: proc(m: ^Heightmap, x, y: int) -> ^u8 {
 
 parse :: proc(input: string) -> ^Heightmap {
 	m := new(Heightmap)
-	m.w, m.h = strings.index_byte(input, '\n'), strings.count(input, "\n")
+	m.w, m.h = 0, 0
+	ngoals := 0
+	for r, i in input {
+		if r == '\n' {
+			if m.w == 0 do m.w = i
+			m.h += 1
+		} else if r == '9' {
+			ngoals += 1
+		}
+	}
 	resize(&m.tiles, m.w * m.h)
+	reserve(&m.goals, ngoals)
 	x, y := 0, 0
 	for r in input {
 		switch r {
