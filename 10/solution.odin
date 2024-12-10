@@ -2,15 +2,24 @@ package main
 
 import "core:fmt"
 import "core:strings"
-import "core:slice"
+
+Vec2 :: distinct [2]int
+
+Heightmap :: struct {
+	tiles: [dynamic]u8,
+	goals: [dynamic]Vec2,
+	w: int,
+	h: int,
+}
 
 main :: proc() {
 	fmt.println("count=", trailheads(#load("input.txt", string)))
 }
 
 trailheads :: proc(input: string) -> uint {
+	context.allocator = context.temp_allocator
+	defer free_all(context.temp_allocator)
 	m := parse(input)
-	defer map_delete(m)
 
 	score :uint = 0
 	for goal in m.goals {
@@ -32,10 +41,13 @@ seek :: proc(m: ^Heightmap, start: Vec2, pos: Vec2, from: u8) -> uint {
 	return ret
 }
 
+at :: proc(m: ^Heightmap, x, y: int) -> ^u8 {
+	return &m.tiles[y*m.h + x]
+}
+
 parse :: proc(input: string) -> ^Heightmap {
-	using strings
 	m := new(Heightmap)
-	m.w, m.h = index_byte(input, '\n'), count(input, "\n")
+	m.w, m.h = strings.index_byte(input, '\n'), strings.count(input, "\n")
 	resize(&m.tiles, m.w * m.h)
 	x, y := 0, 0
 	for r in input {
@@ -52,43 +64,4 @@ parse :: proc(input: string) -> ^Heightmap {
 		}
 	}
 	return m
-}
-
-at :: proc(m: ^Heightmap, x, y: int) -> ^u8 {
-	return &m.tiles[y*m.h + x]
-}
-
-map_delete :: proc(m: ^Heightmap) {
-	delete(m.tiles)
-	delete(m.goals)
-	free(m)
-}
-
-Heightmap :: struct {
-	tiles: [dynamic]u8,
-	goals: [dynamic]Vec2,
-	w: int,
-	h: int,
-}
-
-Vec2 :: distinct [2]int
-
-Example :: struct {
-	input:    string,
-	expected: int,
-}
-
-EXAMPLES :: []Example {
-	{
-		`89010123
-78121874
-87430965
-96549874
-45678903
-32019012
-01329801
-10456732
-`,
-		36,
-	},
 }
