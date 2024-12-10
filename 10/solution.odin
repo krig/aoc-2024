@@ -33,12 +33,12 @@ seek :: proc(m: ^Heightmap, start: Vec2, pos: Vec2, from: u8) {
 	if curr == 0 {
 		poses, ok := &m.paths[start]
 		if ok {
-			if !slice.contains(poses[:], pos) {
+			//if !slice.contains(poses[:], pos) {
 			fmt.println("goal", pos)
 			append(poses, pos)
-			} else {
-				fmt.println("dup", pos)
-			}
+			//} else {
+			//	fmt.println("dup", pos)
+			//}
 		} else {
 			fmt.println("goal!", pos)
 			stuff := make([dynamic]Vec2)
