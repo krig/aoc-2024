@@ -21,7 +21,7 @@ trailheads :: proc(input: string) -> uint {
 	m := parse(input)
 
 	score :uint = 0
-	for goal in m.goals do score += seek(m, goal, goal, 10)
+	for goal in m.goals do score += seek(m, goal, 10)
 	return score
 }
 
@@ -64,15 +64,15 @@ inside :: proc(m: ^Heightmap, x, y: int) -> bool {
 	return x >= 0 && x < m.w && y >= 0 && y < m.h
 }
 
-seek :: proc(m: ^Heightmap, start: Vec2, pos: Vec2, from: u8) -> uint {
+seek :: proc(m: ^Heightmap, pos: Vec2, from: u8) -> uint {
 	if !inside(m, pos.x, pos.y) do return 0
 	curr := at(m, pos.x, pos.y)^
 	if from - curr != 1 do return 0
 	if curr == 0 do return 1
 	ret :uint= 0
-	ret += seek(m, start, {pos.x-1, pos.y}, curr)
-	ret += seek(m, start, {pos.x+1, pos.y}, curr)
-	ret += seek(m, start, {pos.x, pos.y+1}, curr)
-	ret += seek(m, start, {pos.x, pos.y-1}, curr)
+	ret += seek(m, {pos.x-1, pos.y}, curr)
+	ret += seek(m, {pos.x+1, pos.y}, curr)
+	ret += seek(m, {pos.x, pos.y+1}, curr)
+	ret += seek(m, {pos.x, pos.y-1}, curr)
 	return ret
 }
