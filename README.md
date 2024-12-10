@@ -10,6 +10,9 @@ Languages:
    no (see below).
 6. Back to Odin
 7. Also Odin! I liked Odin.
+8. Odin
+9. Odin!
+10. Odin!!
 
 ## Running with Zig
 
