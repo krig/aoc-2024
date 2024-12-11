@@ -8,17 +8,14 @@ import "core:math"
 main :: proc() {
 	input := #load("input.txt", string)
 	//input := "125 17"
+	rounds := 75
 
 	stones:= make(map[uint]uint)
 	defer delete(stones)
 	parse(&input, &stones)
-	for _ in 0..<75 {
-		blink(&stones)
-	}
+	for _ in 0..<rounds do blink(&stones)
 	total :uint= 0
-	for _, v in stones {
-		total += v
-	}
+	for _, v in stones do total += v
 	fmt.println("len =", total)
 }
 
@@ -52,10 +49,8 @@ blink :: proc(data: ^map[uint]uint) {
 }
 
 ndigits :: proc(n: uint) -> uint {
-	c :uint= 0
-	for m :uint = 1; m <= n; m *= 10 {
-		c += 1
-	}
+	c :uint = 0
+	for m :uint = 1; m <= n; m *= 10 do c += 1
 	return c
 }
 
@@ -64,8 +59,8 @@ even :: proc(n: uint) -> bool {
 }
 
 split_at :: proc(n, c: uint) -> (uint, uint) {
-	h :uint= c / 2
-	p :uint= uint(math.pow10(f64(h)))
-	a :uint= n / p
-	return a, n-(a * p)
+	h :uint = c / 2
+	p :uint = uint(math.pow10(f64(h)))
+	a :uint = n / p
+	return a, n - (a * p)
 }
