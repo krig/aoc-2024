@@ -9,47 +9,46 @@ main :: proc() {
 	input := #load("input.txt", string)
 	//input := "125 17"
 
-	stones: [dynamic]uint
+	stones:= make(map[uint]uint)
 	defer delete(stones)
 	parse(&input, &stones)
-	total := 0
-	for s in stones {
-		context.allocator = context.temp_allocator
-		defer free_all(context.temp_allocator)
-		ston:= [dynamic]uint{s}
-		for n in 0..<25 {
-			blink(&ston)
-		}
-		total += len(ston)
-		fmt.println(s, len(ston))
+	for _ in 0..<75 {
+		blink(&stones)
+	}
+	total :uint= 0
+	for _, v in stones {
+		total += v
 	}
 	fmt.println("len =", total)
 }
 
-parse :: proc(input: ^string, output: ^[dynamic]uint) {
+parse :: proc(input: ^string, output: ^map[uint]uint) {
 	for n in strings.split_multi_iterate(input, []string{" ", "\n"}) {
 		if len(n) > 0 {
-			append(output, uint(strconv.atoi(n)))
+			num := uint(strconv.atoi(n))
+			output[num] = output[num] + 1
 		}
 	}
 }
 
-blink :: proc(data: ^[dynamic]uint) {
-	for i := 0; i < len(data); i += 1 {
-		if data[i] == 0 {
-			data[i] = 1
+blink :: proc(data: ^map[uint]uint) {
+	newdata := make(map[uint]uint)
+	for n in data {
+		if n == 0 {
+			newdata[1] += data[n]
 		} else {
-			nd := ndigits(data[i])
+			nd := ndigits(n)
 			if even(nd) {
-				a, b := split_at(data[i], nd)
-				data[i] = a
-				inject_at(data, i+1, b)
-				i += 1
+				a, b := split_at(n, nd)
+				newdata[a] += data[n]
+				newdata[b] += data[n]
 			} else {
-				data[i] *= 2024
+				newdata[n * 2024] += data[n]
 			}
 		}
 	}
+	delete(data^)
+	data^ = newdata
 }
 
 ndigits :: proc(n: uint) -> uint {
