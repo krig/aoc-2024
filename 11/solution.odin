@@ -30,17 +30,17 @@ parse :: proc(input: ^string, output: ^map[uint]uint) {
 
 blink :: proc(data: ^map[uint]uint) {
 	newdata := make(map[uint]uint)
-	for n in data {
+	for n, v in data {
 		if n == 0 {
-			newdata[1] += data[n]
+			newdata[1] += v
 		} else {
 			nd := ndigits(n)
 			if even(nd) {
 				a, b := split_at(n, nd)
-				newdata[a] += data[n]
-				newdata[b] += data[n]
+				newdata[a] += v
+				newdata[b] += v
 			} else {
-				newdata[n * 2024] += data[n]
+				newdata[n * 2024] += v
 			}
 		}
 	}
