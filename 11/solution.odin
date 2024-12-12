@@ -5,47 +5,64 @@ import "core:strings"
 import "core:strconv"
 import "core:math"
 
+Key :: struct {
+  stone: uint,
+  round: uint,
+}
+
 main :: proc() {
 	input := #load("input.txt", string)
 	//input := "125 17"
-	rounds := 75
+	rounds :uint = 75
 
-	stones:= make(map[uint]uint)
+	stones: [dynamic]uint
 	defer delete(stones)
 	parse(&input, &stones)
-	for _ in 0..<rounds do blink(&stones)
+  cache := make(map[Key]uint)
 	total :uint= 0
-	for _, v in stones do total += v
+	for v in stones do total += memoblink(Key{v, rounds}, &cache)
 	fmt.println("len =", total)
 }
 
-parse :: proc(input: ^string, output: ^map[uint]uint) {
+parse :: proc(input: ^string, output: ^[dynamic]uint) {
 	for n in strings.split_multi_iterate(input, []string{" ", "\n"}) {
 		if len(n) > 0 {
 			num := uint(strconv.atoi(n))
-			output[num] = output[num] + 1
+      append(output, num)
 		}
 	}
 }
 
-blink :: proc(data: ^map[uint]uint) {
-	newdata := make(map[uint]uint)
-	for n, v in data {
-		if n == 0 {
-			newdata[1] += v
-		} else {
-			nd := ndigits(n)
-			if even(nd) {
-				a, b := split_at(n, nd)
-				newdata[a] += v
-				newdata[b] += v
-			} else {
-				newdata[n * 2024] += v
-			}
-		}
-	}
-	delete(data^)
-	data^ = newdata
+memoblink :: proc(key: Key, cache: ^map[Key]uint) -> uint {
+  if key in cache^ do return cache[key]
+
+  if key.stone == 0 {
+    if key.round == 1 {
+      cache[key] = 1
+      return 1
+    }
+    v := memoblink(Key {1, key.round - 1}, cache)
+    cache[key] = v
+    return v
+  }
+  nd := ndigits(key.stone)
+  if even(nd) {
+    if key.round == 1 {
+      cache[key] = 2
+      return 2
+    }
+    a, b := split_at(key.stone, nd)
+    v := memoblink(Key { a, key.round - 1 }, cache) + memoblink(Key {b, key.round - 1}, cache)
+    cache[key] = v
+    return v
+  }
+  if key.round == 1 {
+    cache[key] = 1
+    return 1
+  }
+  v := memoblink(Key { key.stone * 2024, key.round - 1 }, cache)
+  cache[key] = v
+  return v
 }
 
 ndigits :: proc(n: uint) -> uint {
