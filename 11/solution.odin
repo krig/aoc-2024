@@ -10,7 +10,10 @@ Key :: struct {
   round: uint,
 }
 
+cache := make(map[Key]uint)
+
 main :: proc() {
+  defer delete(cache)
 	input := #load("input.txt", string)
 	//input := "125 17"
 	rounds :uint = 75
@@ -18,9 +21,8 @@ main :: proc() {
 	stones: [dynamic]uint
 	defer delete(stones)
 	parse(&input, &stones)
-  cache := make(map[Key]uint)
 	total :uint= 0
-	for v in stones do total += memoblink(Key{v, rounds}, &cache)
+	for v in stones do total += memoblink(Key{v, rounds})
 	fmt.println("len =", total)
 }
 
@@ -33,36 +35,30 @@ parse :: proc(input: ^string, output: ^[dynamic]uint) {
 	}
 }
 
-memoblink :: proc(key: Key, cache: ^map[Key]uint) -> uint {
-  if key in cache^ do return cache[key]
+memoblink :: proc(key: Key) -> uint {
+  if key in cache do return cache[key]
+
+  if key.round == 1 {
+    if key.stone == 0 do return memo(key, 1)
+    nd := ndigits(key.stone)
+    if even(nd) do return memo(key, 2)
+    return memo(key, 1)
+  }
 
   if key.stone == 0 {
-    if key.round == 1 {
-      cache[key] = 1
-      return 1
-    }
-    v := memoblink(Key {1, key.round - 1}, cache)
-    cache[key] = v
-    return v
+    return memo(key, memoblink(Key{1, key.round - 1}))
   }
   nd := ndigits(key.stone)
   if even(nd) {
-    if key.round == 1 {
-      cache[key] = 2
-      return 2
-    }
     a, b := split_at(key.stone, nd)
-    v := memoblink(Key { a, key.round - 1 }, cache) + memoblink(Key {b, key.round - 1}, cache)
-    cache[key] = v
-    return v
+    return memo(key, memoblink(Key{ a, key.round - 1 }) + memoblink(Key{b, key.round - 1}))
   }
-  if key.round == 1 {
-    cache[key] = 1
-    return 1
-  }
-  v := memoblink(Key { key.stone * 2024, key.round - 1 }, cache)
-  cache[key] = v
-  return v
+  return memo(key, memoblink(Key{ key.stone * 2024, key.round - 1 }))
+}
+
+memo :: proc(key: Key, val: uint) -> uint {
+  cache[key] = val
+  return val
 }
 
 ndigits :: proc(n: uint) -> uint {
@@ -77,7 +73,7 @@ even :: proc(n: uint) -> bool {
 
 split_at :: proc(n, c: uint) -> (uint, uint) {
 	h :uint = c / 2
-	p :uint = uint(math.pow10(f64(h)))
+	p :uint = uint(math.pow10(f32(h)))
 	a :uint = n / p
 	return a, n - (a * p)
 }
