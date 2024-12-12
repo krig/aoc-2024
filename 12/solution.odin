@@ -42,7 +42,6 @@ main :: proc() {
     }
   }
 
-  // sample expect: 1930
   fmt.println("total fence price =", total)
 }
 
@@ -112,15 +111,11 @@ sum_peri :: proc(board: ^Board, reg: u32) -> uint {
 }
 
 color :: proc(board: ^Board, x, y: int) -> u8 {
-  if x < 0 || y < 0 || x >= board.w || y >= board.h {
-    return 0xff
-  }
+  if x < 0 || y < 0 || x >= board.w || y >= board.h do return 0xff
   return board.data[y*board.h + x]
 }
 
 region :: proc(board: ^Board, x, y: int) -> u32 {
-  if x < 0 || y < 0 || x >= board.w || y >= board.h {
-    return 0
-  }
+  if x < 0 || y < 0 || x >= board.w || y >= board.h do return 0
   return board.region[y*board.h + x]
 }
