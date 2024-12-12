@@ -19,6 +19,19 @@ MIIISIJEEE
 MMMISSJEEE
 `
 
+SAMPLE2 :: `AAAA
+BBCD
+BBCC
+EEEC
+`
+
+SAMPLE3 :: `OOOOO
+OXOXO
+OOOOO
+OXOXO
+OOOOO
+`
+
 INPUT :: #config(INPUT, "input.txt")
 
 Board :: struct {
@@ -30,9 +43,10 @@ Board :: struct {
 
 main :: proc() {
 	input := #load(INPUT, string)
-	//input := SAMPLE
+  //input := SAMPLE
   board := parse(input)
   defer release(board)
+  fmt.println("board", board.w, board.h)
 
   total :uint = 0
 
@@ -68,6 +82,19 @@ parse :: proc(data: string) -> ^Board {
   return board
 }
 
+printreg :: proc(board: ^Board, reg: u32) {
+  for y in -1..=board.h {
+    for x in -1..=board.w {
+      if region(board, x, y) == reg {
+        fmt.print(rune(color(board, x, y)))
+      } else {
+        fmt.print('.')
+      }
+    }
+    fmt.print('\n')
+  }
+}
+
 release :: proc(board: ^Board) {
   delete(board.data)
   free(board)
@@ -79,8 +106,9 @@ sum_region :: proc(board: ^Board, x, y: int) -> uint {
   reg :u32 = 1000 + u32(y*board.h + x)
   area := sum_area(board, x, y, clr, reg)
   peri := sum_peri(board, reg)
-  fmt.println("region =", reg, "color =", rune(clr), "area =", area, "peri =", peri)
-  return area * peri
+  side := sum_side(board, reg)
+  fmt.println("region =", reg, rune(clr), "area =", area, "side =", side)
+  return area * side
 }
 
 sum_area :: proc(board: ^Board, x, y: int, clr: u8, reg: u32) -> uint {
@@ -108,6 +136,62 @@ sum_peri :: proc(board: ^Board, reg: u32) -> uint {
     }
   }
   return peri
+}
+
+sum_side :: proc(board: ^Board, reg: u32) -> uint {
+  printreg(board, reg)
+  side :uint = 0
+  for y in -1..=board.h {
+    above, below := 0, 0
+    for x in -1..=board.w {
+      if region(board, x, y) != reg {
+        if region(board, x, y-1) == reg {
+          if below == 0 {
+            side += 1
+            below = 1
+          }
+        } else {
+          below = 0
+        }
+        if region(board, x, y+1) == reg {
+          if above == 0 {
+            side += 1
+            above = 1
+          }
+        } else {
+          above = 0
+        }
+      } else {
+        above, below = 0, 0
+      }
+    }
+  }
+  for x in -1..=board.w {
+    left, right := 0, 0
+    for y in -1..=board.h {
+      if region(board, x, y) != reg {
+        if region(board, x-1, y) == reg {
+          if left == 0 {
+            side += 1
+            left = 1
+          }
+        } else {
+          left = 0
+        }
+        if region(board, x+1, y) == reg {
+          if right == 0 {
+            side += 1
+            right = 1
+          }
+        } else {
+          right = 0
+        }
+      } else {
+        left, right = 0, 0
+      }
+    }
+  }
+  return side
 }
 
 color :: proc(board: ^Board, x, y: int) -> u8 {
