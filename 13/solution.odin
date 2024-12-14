@@ -13,9 +13,7 @@ INPUT :: #config(INPUT, "input.txt")
 Vec2 :: distinct [2]i64
 
 Game :: struct {
-	a:     Vec2,
-	b:     Vec2,
-	prize: Vec2,
+	a, b, prize: Vec2,
 }
 
 // solve:
@@ -33,19 +31,20 @@ main :: proc() {
 	for part in 1 ..= 2 {
 		tokens: i64 = 0
 		for g in games {
+      ax, ay := g.a.x, g.a.y
+      bx, by := g.b.x, g.b.y
 			c := g.prize.x + (10000000000000 if part == 2 else 0)
 			d := g.prize.y + (10000000000000 if part == 2 else 0)
-			den := g.a.x * g.b.y - g.a.y * g.b.x
 
-			if den != 0 {
-				y := ((d * g.a.x) - (g.a.y * c)) / den
-				x := (c - g.b.x * y) / g.a.x
+			den := ax * by - ay * bx
+			if den == 0 do continue
 
-				if (g.a.x * x + g.b.x * y == c && g.a.y * x + g.b.y * y == d) {
-					tokens += x * 3 + y
-				}
-			}
+      y := ((d * ax) - (ay * c)) / den
+      x := (c - bx * y) / ax
 
+      if (ax * x + bx * y == c && ay * x + by * y == d) {
+        tokens += x * 3 + y
+      }
 		}
 
 		if tokens != expect[part - 1] {
@@ -86,8 +85,7 @@ parse :: proc(input: string) -> [dynamic]Game {
 scan_vec2 :: proc(s: string, del: u8) -> Vec2 {
 	xs := strings.index(s, transmute(string)[]u8{'X', del}) + 2
 	xe := strings.index(strings.cut(s, xs), transmute(string)[]u8{',', ' ', 'Y', del})
-	return Vec2 {
-		i64(strconv.atoi(strings.cut(s, xs, xe))),
-		i64(strconv.atoi(strings.cut(s, xs + xe + 4))),
-	}
+	x, _ := strconv.parse_i64(strings.cut(s, xs, xe), 10)
+	y, _ := strconv.parse_i64(strings.cut(s, xs + xe + 4), 10)
+	return {x, y}
 }
