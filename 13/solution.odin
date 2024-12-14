@@ -6,10 +6,8 @@ import "core:strings"
 
 INPUT :: #config(INPUT, "input.txt")
 
-Vec2 :: distinct [2]i64
-
 Game :: struct {
-	a, b, prize: Vec2,
+	a, b, prize: [2]i64,
 }
 
 // solve:
@@ -77,7 +75,7 @@ parse :: proc(input: string) -> [dynamic]Game {
 	return ret
 }
 
-scan_vec2 :: proc(s: string, del: u8) -> Vec2 {
+scan_vec2 :: proc(s: string, del: u8) -> [2]i64 {
 	xs := strings.index(s, transmute(string)[]u8{'X', del}) + 2
 	xe := strings.index(strings.cut(s, xs), transmute(string)[]u8{',', ' ', 'Y', del})
 	x, _ := strconv.parse_i64(strings.cut(s, xs, xe), 10)
