@@ -31,20 +31,20 @@ main :: proc() {
 	for part in 1 ..= 2 {
 		tokens: i64 = 0
 		for g in games {
-      ax, ay := g.a.x, g.a.y
-      bx, by := g.b.x, g.b.y
+			ax, ay := g.a.x, g.a.y
+			bx, by := g.b.x, g.b.y
 			c := g.prize.x + (10000000000000 if part == 2 else 0)
 			d := g.prize.y + (10000000000000 if part == 2 else 0)
 
 			den := ax * by - ay * bx
 			if den == 0 do continue
 
-      y := ((d * ax) - (ay * c)) / den
-      x := (c - bx * y) / ax
+			y := ((d * ax) - (ay * c)) / den
+			x := (c - bx * y) / ax
 
-      if (ax * x + bx * y == c && ay * x + by * y == d) {
-        tokens += x * 3 + y
-      }
+			if (ax * x + bx * y == c && ay * x + by * y == d) {
+				tokens += x * 3 + y
+			}
 		}
 
 		if tokens != expect[part - 1] {
@@ -56,13 +56,12 @@ main :: proc() {
 }
 
 parse :: proc(input: string) -> [dynamic]Game {
-	ta := context.temp_allocator
-	defer free_all(ta)
-	ret := make([dynamic]Game, 0, 64)
+	input := input
+	ret := make([dynamic]Game, 0, 330)
 	curr: Game
 	parts := 0
 
-	for line in strings.split_lines(input, ta) {
+	for line in strings.split_lines_iterator(&input) {
 		if strings.has_prefix(line, "Button A: ") {
 			curr.a = scan_vec2(line, '+')
 			parts += 1
