@@ -1,12 +1,8 @@
 package main
 
-import "core:container/bit_array"
 import "core:fmt"
-import "core:math"
-import "core:slice"
 import "core:strconv"
 import "core:strings"
-import "core:text/match"
 
 INPUT :: #config(INPUT, "input.txt")
 
