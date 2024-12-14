@@ -46,7 +46,6 @@ main :: proc() {
   //input := SAMPLE
   board := parse(input)
   defer release(board)
-  fmt.println("board", board.w, board.h)
 
   total :uint = 0
 
@@ -107,7 +106,6 @@ sum_region :: proc(board: ^Board, x, y: int) -> uint {
   area := sum_area(board, x, y, clr, reg)
   peri := sum_peri(board, reg)
   side := sum_side(board, reg)
-  fmt.println("region =", reg, rune(clr), "area =", area, "side =", side)
   return area * side
 }
 
@@ -139,7 +137,6 @@ sum_peri :: proc(board: ^Board, reg: u32) -> uint {
 }
 
 sum_side :: proc(board: ^Board, reg: u32) -> uint {
-  printreg(board, reg)
   side :uint = 0
   for y in -1..=board.h {
     above, below := 0, 0
