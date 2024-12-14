@@ -10,11 +10,11 @@ import "core:text/match"
 
 INPUT :: #config(INPUT, "input.txt")
 
-Vec2 :: distinct [2]u64
+Vec2 :: distinct [2]i64
 
 Game :: struct {
-	a: Vec2,
-	b: Vec2,
+	a:     Vec2,
+	b:     Vec2,
 	prize: Vec2,
 }
 
@@ -22,64 +22,56 @@ Game :: struct {
 // Ax*x + Bx*y = C
 // Ay*x + By*y = D
 
-// x = (C - Bx*y)/Ax = (D - By*y)/Ay
-// y = (C - Ax*x)/Bx = (D - Ay*x)/By
-// y = (D - Ay*((C - Bx*y)/Ax))/By
-// By*y = D - Ay*((C - Bx*y)/Ax)
-// By*y + Ay*((C - Bx*y)/Ax) = D
-// Ax*By*y + Ay*(C - Bx*y) = D*Ax
-// Ax*By*y + Ay*C - Ay*Bx*y = D*Ax
-// Ax*By*y - Ay*Bx*y = D*Ax - Ay*C
+// rewritten:
 // y = (D*Ax - Ay*C)/(Ax*By - Ay*Bx)
-
-// y = (C - Ax*((D - By*y)/Ay))/Bx
-// Bx*y = C - Ax*((D - By*y)/Ay)
-// Bx*y + (Ax/Ay)*(D - By*y) = C
-// Ay*Bx*y - Ax*By*y = C*Ay - Ax*D
-// y = (C*Ay - Ax*D)/(Ay*Bx - Ax*By)
+// x = (C - Bx*y)/Ax
 
 main :: proc() {
 	games := parse(#load(INPUT, string))
+	expect := [2]i64{33921, 82261957837868}
 
-	tokens :i128 = 0
+	for part in 1 ..= 2 {
+		tokens: i64 = 0
+		for g in games {
+			c := g.prize.x + (10000000000000 if part == 2 else 0)
+			d := g.prize.y + (10000000000000 if part == 2 else 0)
+			den := g.a.x * g.b.y - g.a.y * g.b.x
 
-	for g in games {
-		x1, y1 :i128= 0, 0
-		den := i128(g.a.x)*i128(g.b.y) - i128(g.a.y)*i128(g.b.x)
-		if den != 0 {
-			y := ((i128(g.prize.y)*i128(g.a.x)) - (i128(g.a.y)*i128(g.prize.x))) / den
-			x := (i128(g.prize.x) - i128(g.b.x)*i128(y))/i128(g.a.x)
-			x1, y1 = x, y
+			if den != 0 {
+				y := ((d * g.a.x) - (g.a.y * c)) / den
+				x := (c - g.b.x * y) / g.a.x
+
+				if (g.a.x * x + g.b.x * y == c && g.a.y * x + g.b.y * y == d) {
+					tokens += x * 3 + y
+				}
+			}
+
 		}
 
-		if (i128(g.a.x)*x1 + i128(g.b.x)*y1 == i128(g.prize.x) &&
-			i128(g.a.y)*x1 + i128(g.b.y)*y1 == i128(g.prize.y)) {
-			fmt.println(g, x1, y1)
-			tokens += x1*3 + y1
+		if tokens != expect[part - 1] {
+			fmt.println("part", part, "got", tokens, "should be", expect[part - 1])
+		} else {
+			fmt.println("part", part, "=", tokens)
 		}
 	}
-
-	fmt.println("Tokens spent:", tokens)
 }
 
 parse :: proc(input: string) -> [dynamic]Game {
 	ta := context.temp_allocator
 	defer free_all(ta)
 	ret := make([dynamic]Game, 0, 64)
-	curr :Game
+	curr: Game
 	parts := 0
 
 	for line in strings.split_lines(input, ta) {
 		if strings.has_prefix(line, "Button A: ") {
-			curr.a = scan_pvec2(line)
+			curr.a = scan_vec2(line, '+')
 			parts += 1
 		} else if strings.has_prefix(line, "Button B: ") {
-			curr.b = scan_pvec2(line)
+			curr.b = scan_vec2(line, '+')
 			parts += 1
 		} else if strings.has_prefix(line, "Prize: ") {
-			curr.prize = scan_vec2(line)
-			curr.prize.x += 10000000000000
-			curr.prize.y += 10000000000000
+			curr.prize = scan_vec2(line, '=')
 			parts += 1
 		}
 
@@ -91,20 +83,11 @@ parse :: proc(input: string) -> [dynamic]Game {
 	return ret
 }
 
-scan_pvec2 :: proc(s: string) -> Vec2 {
-	xs := strings.index(s, "X+") + 2
-	xe := strings.index(strings.cut(s, xs), ", Y+")
-	return Vec2{
-		u64(strconv.atoi(strings.cut(s, xs, xe))),
-		u64(strconv.atoi(strings.cut(s, xs + xe + 4))),
-	}
-}
-
-scan_vec2 :: proc(s: string) -> Vec2 {
-	xs := strings.index(s, "X=") + 2
-	xe := strings.index(strings.cut(s, xs), ", Y=")
-	return Vec2{
-		u64(strconv.atoi(strings.cut(s, xs, xe))),
-		u64(strconv.atoi(strings.cut(s, xs + xe + 4))),
+scan_vec2 :: proc(s: string, del: u8) -> Vec2 {
+	xs := strings.index(s, transmute(string)[]u8{'X', del}) + 2
+	xe := strings.index(strings.cut(s, xs), transmute(string)[]u8{',', ' ', 'Y', del})
+	return Vec2 {
+		i64(strconv.atoi(strings.cut(s, xs, xe))),
+		i64(strconv.atoi(strings.cut(s, xs + xe + 4))),
 	}
 }
