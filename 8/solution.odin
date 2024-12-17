@@ -6,6 +6,7 @@ import "core:math"
 import "core:slice"
 import "core:strconv"
 import "core:strings"
+import "../ko"
 
 Vec2 :: distinct [2]int
 
@@ -115,10 +116,5 @@ count_antinodes :: proc(world: ^World) -> int {
 		}
 		fmt.print("\n")
 	}
-	total := 0
-	it := bit_array.make_iterator(&occupied)
-	for i in bit_array.iterate_by_set(&it) {
-		total += 1
-	}
-	return total
+	return int(ko.count_set(&occupied))
 }
